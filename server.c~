@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 		}
 #ifdef THREAD
 		for (i = 0; i < MAX_THREAD_COUNT; i++)
-			if ((threads[i] == 0) || (pthread_kill(threads[i], 0) == ESRCH))
+			if ((threads[i] == 0) || (pthread_kill(threads[i], 0) != ESRCH))
 				break;
 
 		if (i >= MAX_THREAD_COUNT) 
