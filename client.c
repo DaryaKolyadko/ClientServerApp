@@ -18,10 +18,8 @@ int main(int argc, char **argv)
 	char file_path[MAX_FILEPATH_SIZE];
 	printf("Input file path: ");
 	scanf("%s", file_path);
-	   /* char* result_file_name;
-	    set_result_file_name(file_path);
-	    printf("%s", result_file_name);
-	    printf("%s", file_path);*/
+	char* result_file_name = set_result_file_name(file_path);
+
 
 	struct sockaddr_in server_socket;
 	int server_socket_id = socket(AF_INET, SOCK_STREAM, 0);
@@ -68,20 +66,21 @@ int main(int argc, char **argv)
 
 char* set_result_file_name(char* file_path)
 {
-	char *tokens, *last_token, *file_name;
-	tokens = strtok (file_path,"/");
+	char *tokens;
+	char *last_token = NULL;
+	char *file_name;
 
-	while(tokens != NULL)
+	tokens = strtok(file_path, "/");
+
+	while (tokens != NULL)
 	{
-		memset(last_token, 0, strlen(tokens) + 1);
+		last_token = (char *)malloc(strlen(tokens) + 1);
 		strcpy(last_token, tokens);
-		printf("\nlast: %s", last_token);
 		tokens = strtok(NULL, "/");
 	}
 
-	memset(file_name, 0, strlen(last_token) + strlen(default_name_prefix) + 1);
+	file_name = (char *)malloc(strlen(last_token) + strlen(default_name_prefix) + 1);
 	strcpy(file_name, default_name_prefix);
 	strcat(file_name, last_token);
-	printf("\nlol %s", file_name);
 	return file_name;
 }
