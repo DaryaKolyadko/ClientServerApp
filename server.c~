@@ -107,6 +107,7 @@ void* thread_function(void *param)
 	int bytes_read = 0;
 	int client_id = (int)param;
 	FILE *file;
+
 	memset(data_block, 0, sizeof(data_block));
 
 	bytes_read = read(client_id, file_path, sizeof(file_path) - 1);
