@@ -14,8 +14,6 @@
 #define MAX_THREAD_COUNT 1
 #define MAX_QUEUE_COUNT 5
 
-int current_thread_number = 0;
-
 void* thread_function(void *param);
 
 int main(int argc, char **argv)
@@ -28,11 +26,10 @@ int main(int argc, char **argv)
 #ifdef THREAD	
 	pthread_t threads[MAX_THREAD_COUNT] = {0};
 	int i = 0;
-#elif defined(PROCESS)
+#elif defined (PROCESS)
 	pid_t process_id = 0;
 #endif
-	if ((server_socket_id = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
-	{
+	if ((server_socket_id = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		printf("Error occured while openning socket.\n");
 		return -1;
 	}
@@ -41,24 +38,20 @@ int main(int argc, char **argv)
 	server_socket.sin_addr.s_addr = INADDR_ANY;
 	server_socket.sin_port = htons(PORT);
 
-	if(bind(server_socket_id, (struct sockaddr *)&server_socket, sizeof(server_socket)) < 0)
-	{
+	if (bind(server_socket_id, (struct sockaddr *)&server_socket, sizeof(server_socket)) < 0){
 		printf("Error occured while binding socket to address.\n");
 		return -2;
 	}
 	
-	if(listen(server_socket_id, MAX_QUEUE_COUNT) < 0)
-	{
+	if (listen(server_socket_id, MAX_QUEUE_COUNT) < 0){
 		printf("Error occured while trying to start listening socket.\n");
 		return -3;
 	}
 
-	while(1)
-	{
+	while (1){
 		client_id = accept(server_socket_id, NULL, (socklen_t *)SOCK_CLOEXEC);
 
-		if (client_id < 0)
-		{
+		if (client_id < 0){
 			printf("Error occured while accepting a client.\n");
 			continue;
 		}
@@ -67,22 +60,19 @@ int main(int argc, char **argv)
 			if ((threads[i] == 0) || (pthread_kill(threads[i], 0) == ESRCH))
 				break;
 
-		if (i >= MAX_THREAD_COUNT) 
-		{
+		if (i >= MAX_THREAD_COUNT){
 			printf("No free threads.\n");
 			continue;
 		}
 
-		if (pthread_create(&threads[i], NULL, thread_function, (void*)client_id)) 
-		{
+		if (pthread_create(&threads[i], NULL, thread_function, (void*)client_id)){
 			printf("Thread wasn't created.\n");
 			continue;
 		}
 
 		printf("Thread was created.\n");
 #elif defined(PROCESS)
-		switch (process_id = fork()) 
-		{
+		switch (process_id = fork()){
 		case -1:
 			printf("Process creation failed.\n");
 			break;
@@ -113,8 +103,7 @@ void* thread_function(void *param)
 
 	bytes_read = read(client_id, file_path, sizeof(file_path) - 1);
 
-	if (bytes_read == -1) 
-	{
+	if (bytes_read == -1){
 		printf("Error occured while reading filepath.\n");
 		close(client_id);
 		return;
@@ -122,8 +111,7 @@ void* thread_function(void *param)
 
 	file_path[bytes_read] = 0;
 
-	if (access(file_path, F_OK) == -1) 
-	{
+	if (access(file_path, F_OK) == -1){
 		printf("File not found.\n");
 		close(client_id);
 		return;
@@ -131,26 +119,22 @@ void* thread_function(void *param)
 
 	file = fopen(file_path, "rb");
 
-	if (file == NULL) 
-	{
+	if (file == NULL){
 		printf("Error occured while trying to open file.\n");
 		close(client_id);
 		return;
 	}
 
-	while (1) 
-	{
+	while (1){
 		bytes_read = fread(data_block, 1, MAX_DATA_BLOCK_SIZE, file);
 	
-		if (bytes_read > 0) 
-		{
+		if (bytes_read > 0){
 			bytes_send = write(client_id, data_block, bytes_read);
 			if (bytes_send < bytes_read)
 				printf("Error occured while sending file.\n");
 		}
 
-		if (bytes_read < MAX_DATA_BLOCK_SIZE) 
-		{
+		if (bytes_read < MAX_DATA_BLOCK_SIZE){
 			if (feof(file))
 				printf("File was sent.\n");
 			if (ferror(file))

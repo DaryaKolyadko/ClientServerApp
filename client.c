@@ -22,8 +22,7 @@ int main(int argc, char **argv)
 	struct sockaddr_in server_socket;
 	int server_socket_id = socket(AF_INET, SOCK_STREAM, 0);
 
-	if(server_socket_id< 0)
-	{
+	if (server_socket_id< 0){
 		printf("Error occured while openning socket.\n");
 		return -1;
 	}
@@ -32,14 +31,12 @@ int main(int argc, char **argv)
 	server_socket.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server_socket.sin_port = htons(PORT);
 
-	if(connect(server_socket_id, (struct sockaddr *)&server_socket, sizeof(server_socket)) < 0)
-	{
+	if (connect(server_socket_id, (struct sockaddr *)&server_socket, sizeof(server_socket)) < 0){
 		printf("Error occured while trying to set up a connection.\n");
 		return -2;
 	}
 
-	if (send(server_socket_id, file_path, strlen(file_path), 0) < 0) 
-	{
+	if (send(server_socket_id, file_path, strlen(file_path), 0) < 0){
 		printf("Send failed.\n");
 		return -3;
 	}
@@ -48,8 +45,8 @@ int main(int argc, char **argv)
 	file = fopen(result_file_name, "wb");
 	int bytes_received;
 	char data_block[MAX_DATA_BLOCK_SIZE];
-	while ((bytes_received = read(server_socket_id, data_block, MAX_DATA_BLOCK_SIZE)) > 0) 
-	{
+
+	while ((bytes_received = read(server_socket_id, data_block, MAX_DATA_BLOCK_SIZE)) > 0){
 		fwrite(data_block, 1, bytes_received, file);
 	}
 
@@ -72,8 +69,7 @@ char* set_result_file_name(char* file_path)
 
 	tokens = strtok(buffer, "/");
 
-	while (tokens != NULL)
-	{
+	while (tokens != NULL){
 		last_token = (char *)malloc(strlen(tokens) + 1);
 		strcpy(last_token, tokens);
 		tokens = strtok(NULL, "/");
